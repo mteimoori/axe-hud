@@ -1,5 +1,6 @@
 import type { Store } from '../store'
 import type { WidgetPosition } from '../types'
+import { Modal } from './Modal'
 import { Sidebar } from './Sidebar'
 import type { HudActions, HudState, ImpactFilter } from './state'
 import { useStore } from './useStore'
@@ -21,6 +22,7 @@ export function App({ store, position, actions }: AppProps) {
   return (
     <>
       <Sidebar state={state} actions={actions} onClose={close} onFilter={setFilter} />
+      <Modal state={state} actions={actions} />
       <Widget state={state} position={position} onToggle={toggle} />
     </>
   )

@@ -1,10 +1,11 @@
 import { resolveEnabled } from './env'
 import { NavigationObserver } from './navigation'
+import { countByImpact } from './results'
 import { AxeRunner } from './runner'
 import { Store } from './store'
 import type { AuditOutcome, AxeHudController, AxeHudOptions } from './types'
 import { mountHud } from './ui/mount'
-import { initialHudState, type HudState } from './ui/state'
+import { initialHudState, type HudActions, type HudState } from './ui/state'
 
 const NOOP_CONTROLLER: AxeHudController = {
   audit: async () => {},
@@ -42,10 +43,22 @@ export function createAxeHud(options: AxeHudOptions = {}): AxeHudController {
     debounceMs: options.debounceMs,
   })
   const navigation = new NavigationObserver()
+  const modalMode = options.modal ?? 'onViolations'
+  const dismissedModals = new Set<string>()
 
   const emit = (outcome: AuditOutcome): void => {
+    if (outcome.status === 'running') {
+      // New audit (often a navigation) — clear any stale per-page modal.
+      store.set({ outcome, modalOpen: false })
+      return
+    }
     store.set({ outcome })
-    if (outcome.status !== 'running') options.onAudit?.(outcome)
+    options.onAudit?.(outcome)
+    if (outcome.status !== 'done' || modalMode === 'never') return
+    const showModal = modalMode === 'always' || countByImpact(outcome.results).total > 0
+    if (showModal && !dismissedModals.has(outcome.url)) {
+      store.set({ modalOpen: true })
+    }
   }
 
   const auditNow = async (): Promise<void> => {
@@ -53,9 +66,19 @@ export function createAxeHud(options: AxeHudOptions = {}): AxeHudController {
     if (outcome) emit(outcome)
   }
 
-  const mount = mountHud(store, options.position ?? 'bottom-right', {
+  const actions: HudActions = {
     rerun: () => void auditNow(),
-  })
+    dismissModal: () => {
+      dismissedModals.add(store.get().outcome.url)
+      store.set({ modalOpen: false })
+    },
+    viewReport: () => {
+      dismissedModals.add(store.get().outcome.url)
+      store.set({ open: true, modalOpen: false })
+    },
+  }
+
+  const mount = mountHud(store, options.position ?? 'bottom-right', actions)
 
   const runOnInitial = options.runOn?.initial ?? true
   const runOnNavigation = options.runOn?.navigation ?? true

@@ -8,6 +8,8 @@ export interface HudState {
   outcome: AuditOutcome
   /** Whether the report sidebar is open. */
   open: boolean
+  /** Whether the per-page summary modal is showing. */
+  modalOpen: boolean
   /** Severity filter applied to the report. */
   filter: ImpactFilter
 }
@@ -16,12 +18,17 @@ export interface HudState {
 export interface HudActions {
   /** Re-run the audit on the current page. */
   rerun(): void
+  /** Dismiss the per-page modal (remembered for the current URL). */
+  dismissModal(): void
+  /** Open the full report sidebar and dismiss the modal. */
+  viewReport(): void
 }
 
 export function initialHudState(url: string): HudState {
   return {
     outcome: { status: 'idle', url, timestamp: 0, results: null, error: null },
     open: false,
+    modalOpen: false,
     filter: 'all',
   }
 }
