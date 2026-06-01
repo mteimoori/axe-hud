@@ -16,6 +16,9 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      # Git hooks are a local-dev concern; never run them in CI.
+      HUSKY: '0'
     steps:
       - uses: actions/checkout@v4
 
@@ -42,6 +45,8 @@ jobs:
         with:
           version: pnpm exec changeset version
           publish: pnpm exec changeset publish
+          commit: 'chore: version packages'
+          title: 'chore: version packages'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
