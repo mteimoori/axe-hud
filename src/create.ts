@@ -1,4 +1,5 @@
 import { resolveEnabled } from './env'
+import { Highlighter } from './highlight'
 import { NavigationObserver } from './navigation'
 import { countByImpact } from './results'
 import { AxeRunner } from './runner'
@@ -66,6 +67,8 @@ export function createAxeHud(options: AxeHudOptions = {}): AxeHudController {
     if (outcome) emit(outcome)
   }
 
+  let highlighter: Highlighter | null = null
+
   const actions: HudActions = {
     rerun: () => void auditNow(),
     dismissModal: () => {
@@ -76,9 +79,11 @@ export function createAxeHud(options: AxeHudOptions = {}): AxeHudController {
       dismissedModals.add(store.get().outcome.url)
       store.set({ open: true, modalOpen: false })
     },
+    highlight: (target) => highlighter?.highlight(target),
   }
 
   const mount = mountHud(store, options.position ?? 'bottom-right', actions)
+  highlighter = new Highlighter(mount.root)
 
   const runOnInitial = options.runOn?.initial ?? true
   const runOnNavigation = options.runOn?.navigation ?? true
@@ -98,6 +103,7 @@ export function createAxeHud(options: AxeHudOptions = {}): AxeHudController {
     destroy: () => {
       runner.cancel()
       navigation.stop()
+      highlighter?.destroy()
       mount.unmount()
     },
   }

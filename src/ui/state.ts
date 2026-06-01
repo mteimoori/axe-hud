@@ -1,3 +1,4 @@
+import type { NodeResult } from 'axe-core'
 import type { AuditOutcome, Impact } from '../types'
 
 /** Active severity filter in the sidebar. */
@@ -22,6 +23,8 @@ export interface HudActions {
   dismissModal(): void
   /** Open the full report sidebar and dismiss the modal. */
   viewReport(): void
+  /** Outline a failing element on the page and scroll it into view. */
+  highlight(target: NodeResult['target']): void
 }
 
 export function initialHudState(url: string): HudState {

@@ -34,7 +34,7 @@ export function Sidebar({ state, actions, onClose, onFilter }: SidebarProps) {
   const running = state.outcome.status === 'running'
 
   return (
-    <aside class="axe-hud-sidebar" role="dialog" aria-label="Accessibility report">
+    <div class="axe-hud-sidebar" role="dialog" aria-label="Accessibility report">
       <header class="axe-hud-sidebar__header">
         <h2 class="axe-hud-sidebar__title">Accessibility</h2>
         <div class="axe-hud-sidebar__actions">
@@ -80,10 +80,10 @@ export function Sidebar({ state, actions, onClose, onFilter }: SidebarProps) {
       {visible.length > 0 && (
         <ul class="axe-hud-findings">
           {visible.map((violation) => (
-            <FindingCard key={violation.id} violation={violation} />
+            <FindingCard key={violation.id} violation={violation} onHighlight={actions.highlight} />
           ))}
         </ul>
       )}
-    </aside>
+    </div>
   )
 }

@@ -153,7 +153,17 @@ export const hudStyles = `
 .axe-hud-finding__link:hover { text-decoration: underline; }
 .axe-hud-finding__nodes-label { margin: 12px 0 6px; font-size: 12px; font-weight: 600; color: #6b7280; }
 .axe-hud-finding__nodes { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
-.axe-hud-finding__nodes code {
+.axe-hud-node {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+.axe-hud-node code {
   display: block;
   padding: 8px 10px;
   background: #f6f7f9;
@@ -162,6 +172,22 @@ export const hudStyles = `
   font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   color: #1f2937;
   overflow-wrap: anywhere;
+}
+.axe-hud-node:hover code { background: #eef2ff; border-color: #c7d2fe; }
+.axe-hud-node:focus-visible { outline: 2px solid #2563eb; outline-offset: 1px; border-radius: 8px; }
+
+.axe-hud-highlight {
+  position: fixed;
+  z-index: 2147482000;
+  pointer-events: none;
+  border: 2px solid #2563eb;
+  border-radius: 3px;
+  background: rgba(37, 99, 235, 0.12);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+  transition: top 120ms ease, left 120ms ease, width 120ms ease, height 120ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .axe-hud-highlight { transition: none; }
 }
 
 .axe-hud-modal {

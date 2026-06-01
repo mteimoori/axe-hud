@@ -1,4 +1,4 @@
-import type { Result } from 'axe-core'
+import type { NodeResult, Result } from 'axe-core'
 import { useState } from 'preact/hooks'
 import { normalizeImpact } from '../results'
 
@@ -9,10 +9,11 @@ function formatTarget(target: readonly unknown[]): string {
 
 export interface FindingCardProps {
   violation: Result
+  onHighlight: (target: NodeResult['target']) => void
 }
 
 /** A single violated rule: collapsed summary that expands to description, docs, and failing nodes. */
-export function FindingCard({ violation }: FindingCardProps) {
+export function FindingCard({ violation, onHighlight }: FindingCardProps) {
   const [open, setOpen] = useState(false)
   const impact = normalizeImpact(violation.impact) ?? 'minor'
 
@@ -48,7 +49,14 @@ export function FindingCard({ violation }: FindingCardProps) {
           <ul class="axe-hud-finding__nodes">
             {violation.nodes.map((node, index) => (
               <li key={index}>
-                <code>{formatTarget(node.target)}</code>
+                <button
+                  type="button"
+                  class="axe-hud-node"
+                  title="Highlight this element on the page"
+                  onClick={() => onHighlight(node.target)}
+                >
+                  <code>{formatTarget(node.target)}</code>
+                </button>
               </li>
             ))}
           </ul>

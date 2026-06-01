@@ -7,6 +7,8 @@ import type { HudActions, HudState } from './state'
 import { hudStyles } from './styles'
 
 export interface HudMount {
+  /** The shadow root the HUD is rendered into (overlays attach here too). */
+  root: ShadowRoot
   /** Remove the HUD from the DOM and unmount the Preact tree. */
   unmount(): void
 }
@@ -37,6 +39,7 @@ export function mountHud(
   render(<App store={store} position={position} actions={actions} />, container)
 
   return {
+    root: shadow,
     unmount() {
       render(null, container)
       host.remove()
