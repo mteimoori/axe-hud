@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from 'preact/hooks'
 import { countByImpact } from '../results'
 import { IMPACT_ORDER } from '../types'
 import { FindingCard } from './FindingCard'
@@ -23,6 +24,27 @@ export interface SidebarProps {
 
 /** Slide-in report panel: severity filters plus the list of expandable findings. */
 export function Sidebar({ state, actions, onClose, onFilter }: SidebarProps) {
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  // Non-modal dialog behaviour: focus the panel on open, close on Escape, and return focus to
+  // the widget on close. No focus trap — the page stays usable so highlighted elements are reachable.
+  useLayoutEffect(() => {
+    if (!state.open) return
+    const root = panelRef.current?.getRootNode() as ParentNode | null
+    panelRef.current?.focus()
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+      const fab = root?.querySelector?.('.axe-hud-fab') as HTMLElement | null
+      fab?.focus()
+    }
+  }, [state.open, onClose])
+
   if (!state.open) return null
 
   const violations = state.outcome.results?.violations ?? []
@@ -34,7 +56,13 @@ export function Sidebar({ state, actions, onClose, onFilter }: SidebarProps) {
   const running = state.outcome.status === 'running'
 
   return (
-    <div class="axe-hud-sidebar" role="dialog" aria-label="Accessibility report">
+    <div
+      ref={panelRef}
+      class="axe-hud-sidebar"
+      role="dialog"
+      aria-label="Accessibility report"
+      tabIndex={-1}
+    >
       <header class="axe-hud-sidebar__header">
         <h2 class="axe-hud-sidebar__title">Accessibility</h2>
         <div class="axe-hud-sidebar__actions">

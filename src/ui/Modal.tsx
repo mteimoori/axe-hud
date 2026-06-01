@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from 'preact/hooks'
 import { countByImpact, worstImpact } from '../results'
 import { IMPACT_ORDER } from '../types'
 import type { HudActions, HudState } from './state'
@@ -9,6 +10,19 @@ export interface ModalProps {
 
 /** Lightweight per-page summary card shown after an audit. The detailed view lives in the sidebar. */
 export function Modal({ state, actions }: ModalProps) {
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  useLayoutEffect(() => {
+    if (!state.modalOpen) return
+    cardRef.current?.querySelector<HTMLElement>('.axe-hud-btn')?.focus()
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') actions.dismissModal()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [state.modalOpen, actions])
+
   if (!state.modalOpen) return null
 
   const counts = countByImpact(state.outcome.results)
@@ -19,7 +33,12 @@ export function Modal({ state, actions }: ModalProps) {
       : `${counts.total} accessibility ${counts.total === 1 ? 'issue' : 'issues'} on this page`
 
   return (
-    <div class="axe-hud-modal" role="dialog" aria-label="Accessibility summary for this page">
+    <div
+      ref={cardRef}
+      class="axe-hud-modal"
+      role="dialog"
+      aria-label="Accessibility summary for this page"
+    >
       <div class="axe-hud-modal__head">
         <span class={`axe-hud-dot axe-hud-dot--${worst ?? 'minor'}`} aria-hidden="true" />
         <strong class="axe-hud-modal__title">{heading}</strong>
