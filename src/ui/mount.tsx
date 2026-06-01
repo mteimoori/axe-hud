@@ -3,7 +3,7 @@ import { HUD_ROOT_ID } from '../runner'
 import type { Store } from '../store'
 import type { WidgetPosition } from '../types'
 import { App } from './App'
-import type { HudState } from './state'
+import type { HudActions, HudState } from './state'
 import { hudStyles } from './styles'
 
 export interface HudMount {
@@ -17,7 +17,11 @@ export interface HudMount {
  * The host element carries {@link HUD_ROOT_ID} so axe scans can exclude it, and the shadow
  * boundary keeps the HUD's styles from leaking into — or being broken by — the host page.
  */
-export function mountHud(store: Store<HudState>, position: WidgetPosition): HudMount {
+export function mountHud(
+  store: Store<HudState>,
+  position: WidgetPosition,
+  actions: HudActions,
+): HudMount {
   const host = document.createElement('div')
   host.id = HUD_ROOT_ID
 
@@ -30,7 +34,7 @@ export function mountHud(store: Store<HudState>, position: WidgetPosition): HudM
   shadow.appendChild(container)
   document.body.appendChild(host)
 
-  render(<App store={store} position={position} />, container)
+  render(<App store={store} position={position} actions={actions} />, container)
 
   return {
     unmount() {

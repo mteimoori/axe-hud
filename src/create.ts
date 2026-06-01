@@ -42,12 +42,20 @@ export function createAxeHud(options: AxeHudOptions = {}): AxeHudController {
     debounceMs: options.debounceMs,
   })
   const navigation = new NavigationObserver()
-  const mount = mountHud(store, options.position ?? 'bottom-right')
 
   const emit = (outcome: AuditOutcome): void => {
     store.set({ outcome })
     if (outcome.status !== 'running') options.onAudit?.(outcome)
   }
+
+  const auditNow = async (): Promise<void> => {
+    const outcome = await runner.run()
+    if (outcome) emit(outcome)
+  }
+
+  const mount = mountHud(store, options.position ?? 'bottom-right', {
+    rerun: () => void auditNow(),
+  })
 
   const runOnInitial = options.runOn?.initial ?? true
   const runOnNavigation = options.runOn?.navigation ?? true
@@ -61,10 +69,7 @@ export function createAxeHud(options: AxeHudOptions = {}): AxeHudController {
   }
 
   return {
-    async audit() {
-      const outcome = await runner.run()
-      if (outcome) emit(outcome)
-    },
+    audit: auditNow,
     open: () => store.set({ open: true }),
     close: () => store.set({ open: false }),
     destroy: () => {
