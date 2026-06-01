@@ -1,4 +1,4 @@
-import { AxeHudProvider } from 'axe-hud/react'
+import { AxeHudProvider, useAxeHud } from 'axe-hud/react'
 import { useEffect, useState, type ReactNode } from 'react'
 
 interface Page {
@@ -89,10 +89,46 @@ function CleanPage() {
   )
 }
 
+function DialogPage() {
+  const hud = useAxeHud()
+  const [open, setOpen] = useState(false)
+
+  // Opening the dialog changes the view without a route change. axe-hud doesn't watch DOM
+  // mutations, so we re-audit programmatically once the new view has rendered.
+  useEffect(() => {
+    hud?.audit()
+  }, [open, hud])
+
+  return (
+    <section>
+      <h2>In-page dialog</h2>
+      <p>
+        This opens a dialog without changing the route. Since there's no navigation event, the demo
+        calls <code>hud.audit()</code> after the view changes so the HUD re-checks the page.
+      </p>
+      <button type="button" onClick={() => setOpen(true)}>
+        Open dialog
+      </button>
+
+      {open && (
+        <div role="dialog" aria-label="Example dialog" className="demo-dialog">
+          {/* Violation: input without a label. */}
+          <input type="text" placeholder="Unlabelled field" />
+          {/* Violation: low colour contrast. */}
+          <p className="low-contrast">Low-contrast text inside the dialog.</p>
+          {/* Violation: close button with no accessible name. */}
+          <button type="button" className="icon-button" onClick={() => setOpen(false)} />
+        </div>
+      )}
+    </section>
+  )
+}
+
 const PAGES: Page[] = [
   { path: '#/', label: 'Home', render: () => <HomePage /> },
   { path: '#/forms', label: 'Form', render: () => <FormsPage /> },
   { path: '#/media', label: 'Media', render: () => <MediaPage /> },
+  { path: '#/dialog', label: 'Dialog', render: () => <DialogPage /> },
   { path: '#/clean', label: 'Clean', render: () => <CleanPage /> },
 ]
 
