@@ -67,10 +67,33 @@ function MediaPage() {
   )
 }
 
+function CleanPage() {
+  return (
+    <section>
+      <h2>Accessible page</h2>
+      <p>This page has no seeded violations, so the widget stays green after the audit.</p>
+      <label>
+        Your name
+        <input type="text" />
+      </label>
+      <img
+        src="https://placehold.co/120"
+        width={120}
+        height={120}
+        alt="A grey placeholder square"
+      />
+      <p>
+        <button type="button">A properly labelled button</button>
+      </p>
+    </section>
+  )
+}
+
 const PAGES: Page[] = [
   { path: '#/', label: 'Home', render: () => <HomePage /> },
   { path: '#/forms', label: 'Form', render: () => <FormsPage /> },
   { path: '#/media', label: 'Media', render: () => <MediaPage /> },
+  { path: '#/clean', label: 'Clean', render: () => <CleanPage /> },
 ]
 
 export function App() {
