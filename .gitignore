@@ -44,6 +44,3 @@ Thumbs.db
 
 # Misc
 *.tgz
-.changeset/*.md
-!.changeset/README.md
-!.changeset/config.json
