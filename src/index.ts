@@ -11,7 +11,6 @@ export type {
   Environment,
   Impact,
   ImpactCounts,
-  ModalMode,
   WidgetPosition,
 } from './types'
 export { IMPACT_ORDER } from './types'

@@ -1,14 +1,6 @@
-import { countByImpact, worstImpact } from '../results'
-import type { Impact, WidgetPosition } from '../types'
+import { countByImpact } from '../results'
+import type { WidgetPosition } from '../types'
 import type { HudState } from './state'
-
-const IMPACT_COLOR: Record<Impact, string> = {
-  critical: '#b91c1c',
-  serious: '#c2410c',
-  moderate: '#a16207',
-  minor: '#3f6212',
-}
-const CLEAN_COLOR = '#15803d'
 
 const CORNER: Record<WidgetPosition, string> = {
   'bottom-right': 'bottom:16px;right:16px',
@@ -23,29 +15,39 @@ export interface WidgetProps {
   onToggle: () => void
 }
 
-/** Floating action button showing a live violation count, colored by worst severity. */
+/**
+ * Floating action button.
+ *
+ * Neutral (white) before the first audit and while one is running; red once an audit finds
+ * violations, green once an audit completes clean.
+ */
 export function Widget({ state, position, onToggle }: WidgetProps) {
+  const { status } = state.outcome
   const counts = countByImpact(state.outcome.results)
-  const worst = worstImpact(counts)
-  const running = state.outcome.status === 'running'
-  const accent = worst ? IMPACT_COLOR[worst] : CLEAN_COLOR
+  const running = status === 'running'
+  const settled = status === 'done'
+  const tone = settled ? (counts.total > 0 ? 'violation' : 'clean') : 'neutral'
+  const count = running ? '…' : settled ? counts.total : '–'
   const label = running
     ? 'Running accessibility audit'
-    : `Accessibility: ${counts.total} ${counts.total === 1 ? 'issue' : 'issues'}`
+    : settled
+      ? `Accessibility: ${counts.total} ${counts.total === 1 ? 'issue' : 'issues'}`
+      : 'Accessibility audit'
 
   return (
     <button
       type="button"
-      class="axe-hud-fab"
-      style={`${CORNER[position]};--axe-hud-accent:${accent}`}
+      class={`axe-hud-fab axe-hud-fab--${tone}`}
+      style={CORNER[position]}
       aria-label={label}
       aria-expanded={state.open}
+      aria-busy={running}
       onClick={onToggle}
     >
       <span class="axe-hud-fab__glyph" aria-hidden="true">
         axe
       </span>
-      <span class="axe-hud-fab__count">{running ? '…' : counts.total}</span>
+      <span class="axe-hud-fab__count">{count}</span>
     </button>
   )
 }

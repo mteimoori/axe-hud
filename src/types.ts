@@ -12,9 +12,6 @@ export const IMPACT_ORDER: readonly Impact[] = ['critical', 'serious', 'moderate
 /** Corner the floating widget is anchored to. */
 export type WidgetPosition = 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
 
-/** When the per-page summary modal is shown after an audit. */
-export type ModalMode = 'always' | 'onViolations' | 'never'
-
 /** Lifecycle of a single audit. */
 export type AuditStatus = 'idle' | 'running' | 'done' | 'error'
 
@@ -64,8 +61,6 @@ export interface AxeHudOptions {
   runOn?: { initial?: boolean; navigation?: boolean }
   /** Debounce window, in milliseconds, for navigation-triggered audits. */
   debounceMs?: number
-  /** When to surface the per-page summary modal. Defaults to `'onViolations'`. */
-  modal?: ModalMode
   /** Corner the widget is anchored to. Defaults to `'bottom-right'`. */
   position?: WidgetPosition
   /** Called with every completed (or failed) audit outcome. */
