@@ -1,0 +1,70 @@
+:root {
+  color-scheme: light;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  color: #1f2937;
+}
+
+body {
+  margin: 0;
+  background: #f8fafc;
+}
+
+.site-header {
+  padding: 24px 32px;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+}
+.site-header h1 {
+  margin: 0 0 12px;
+  font-size: 22px;
+}
+.site-header nav {
+  display: flex;
+  gap: 16px;
+}
+.site-header nav a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+}
+.site-header nav a[aria-current='page'] {
+  text-decoration: underline;
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+section h2 {
+  margin-top: 0;
+}
+
+input,
+select {
+  display: block;
+  margin: 8px 0;
+  padding: 8px 10px;
+  font: inherit;
+}
+
+/* Intentionally low contrast to trigger a colour-contrast violation. */
+.low-contrast {
+  color: #c9ccd1;
+}
+
+/* Intentionally nameless icon button to trigger a button-name violation. */
+.icon-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+}
