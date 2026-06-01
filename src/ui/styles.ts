@@ -84,13 +84,17 @@ export const hudStyles = `
 .axe-hud-sidebar__actions { display: inline-flex; gap: 4px; }
 
 .axe-hud-icon-btn {
-  width: 32px;
-  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
   border: none;
   border-radius: 8px;
   background: transparent;
   color: #374151;
-  font-size: 16px;
+  font-size: 20px;
+  line-height: 1;
   cursor: pointer;
 }
 .axe-hud-icon-btn:hover { background: #f3f4f6; }
