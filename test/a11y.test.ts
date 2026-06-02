@@ -19,7 +19,6 @@ function shadow(): ShadowRoot {
 
 function open() {
   const hud = createAxeHud({
-    enabled: true,
     axe: fakeAxe(),
     runOn: { initial: false, navigation: false },
   })

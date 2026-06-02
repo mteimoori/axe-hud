@@ -35,7 +35,6 @@ describe('Sidebar', () => {
 
   async function openWith(violations: Result[]) {
     const hud = createAxeHud({
-      enabled: true,
       axe: fakeAxe(violations),
       runOn: { initial: false, navigation: false },
     })
@@ -83,7 +82,6 @@ describe('Sidebar', () => {
 
   it('is not rendered until opened', async () => {
     const hud = createAxeHud({
-      enabled: true,
       axe: fakeAxe([violation('a', 'critical')]),
       runOn: { initial: false, navigation: false },
     })

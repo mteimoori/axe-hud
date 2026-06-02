@@ -15,7 +15,6 @@ function fakeAxe(): AxeLike {
 }
 
 const providerProps = {
-  enabled: true,
   axe: fakeAxe(),
   runOn: { initial: false, navigation: false },
 }
