@@ -60,6 +60,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "docs:api": "typedoc",
     "changeset": "changeset",
     "prepare": "husky",
     "prepublishOnly": "pnpm build"
@@ -91,7 +92,7 @@
     ]
   },
   "dependencies": {
-    "axe-core": "^4.11.4",
+    "axe-core": "^4.12.0",
     "preact": "^10.29.2"
   },
   "devDependencies": {
@@ -111,6 +112,7 @@
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "tsup": "^8.5.1",
+    "typedoc": "^0.28.19",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.60.0",
     "vitest": "^4.1.8"
