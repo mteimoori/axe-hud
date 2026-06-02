@@ -1,56 +1,73 @@
-# Environments & the production gate
+# Loading axe-hud (and keeping it out of production)
 
-axe-hud is a development/QA aid. It is designed to be **off in production** and on only where you
-want it (local, preview, staging). This page explains how that gate works and how to control it.
+axe-hud is a development/QA aid. **The library has no environment logic of its own** —
+`createAxeHud()` mounts the HUD whenever it's called in a browser. You decide where it runs by
+deciding where you load it.
 
-## How detection works
+The reliable way to keep it out of production is simply to **not import it there**. A guarded
+dynamic `import()` lets the bundler drop the entire chunk (axe-hud + axe-core) from builds where the
+condition is statically false — so production ships zero bytes of it.
 
-When you don't pass `enabled`, axe-hud classifies the current `window.location.hostname` into one
-of: `local`, `preview`, `stage`, `production`, or `unknown`, using generic, vendor-neutral
-heuristics:
-
-| Environment  | Matched when the hostname…                                                                                                                                |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `local`      | is `localhost`, `127.0.0.1`, `0.0.0.0`, `::1`, or ends in `.local` / `.localhost`                                                                         |
-| `preview`    | contains `preview`, `deploy-preview`, `pr-<n>`, `branch`, or is a `*.vercel.app` / `*.netlify.app` / `*.pages.dev` / `*.onrender.com` / `*.surge.sh` host |
-| `stage`      | contains `stag`, `staging`, `stage`, `stg`, `test`, `testing`, `qa`, `uat`, or `sandbox`                                                                  |
-| `production` | anything else (the safe default)                                                                                                                          |
-| `unknown`    | there is no DOM (e.g. server-side rendering)                                                                                                              |
-
-**The gate fails safe:** anything not clearly local/preview/stage is treated as `production`, and
-`production` (and `unknown`) never enable the HUD implicitly.
-
-## Controlling the gate
+## Load only in local + staging
 
 ```ts
-import { createAxeHud } from 'axe-hud'
+// Your build exposes some env identifier; use whatever your tooling provides.
+const APP_ENV = import.meta.env.VITE_APP_ENV
 
-// 1. Let detection decide (default allowlist: local, preview, stage):
-createAxeHud()
-
-// 2. Force it explicitly (wins over detection) — e.g. only in dev builds:
-createAxeHud({ enabled: import.meta.env.DEV })
-
-// 3. Narrow the allowlist:
-createAxeHud({ environments: ['local'] })
-
-// 4. Provide your own detector for a bespoke hosting scheme:
-createAxeHud({
-  detect: () => (location.hostname.endsWith('.internal.example') ? 'stage' : 'production'),
-})
+if (APP_ENV === 'development' || APP_ENV === 'staging') {
+  const { createAxeHud } = await import('axe-hud')
+  createAxeHud()
+}
 ```
 
-## Verifying
+Because the `import()` lives in a branch that is `false` in a production build, bundlers
+(Vite/Rollup, webpack, esbuild) tree-shake the whole module out — including axe-core.
 
-When the HUD activates it logs a one-line notice, e.g. `[axe-hud] active — enabled for stage`. If
-you don't see the widget, check that line (or its absence) to understand the gate's decision.
-
-## Inspecting detection yourself
+## Other common gates
 
 ```ts
-import { detectEnvironment, resolveEnabled } from 'axe-hud'
-
-detectEnvironment() // => 'local' | 'preview' | 'stage' | 'production' | 'unknown'
-detectEnvironment('staging.example.com') // => 'stage'
-resolveEnabled({ environments: ['local'] }) // => { enabled, environment, reason }
+// Vite dev server only (local):
+if (import.meta.env.DEV) {
+  const { createAxeHud } = await import('axe-hud')
+  createAxeHud()
+}
 ```
+
+```ts
+// Node-style env var (webpack and friends):
+if (['development', 'staging'].includes(process.env.APP_ENV ?? '')) {
+  import('axe-hud').then(({ createAxeHud }) => createAxeHud())
+}
+```
+
+```ts
+// A manual switch (query string, localStorage, feature flag…):
+if (new URLSearchParams(location.search).has('a11y')) {
+  import('axe-hud').then(({ createAxeHud }) => createAxeHud())
+}
+```
+
+## React
+
+Gate the provider — or, better, its import — the same way:
+
+```tsx
+// AxeHudGate.tsx — only pulled into dev/staging bundles
+import { AxeHudProvider } from 'axe-hud/react'
+export const Gate = AxeHudProvider
+
+// app entry
+let Gate = ({ children }: { children: React.ReactNode }) => <>{children}</>
+if (import.meta.env.VITE_APP_ENV !== 'production') {
+  Gate = (await import('./AxeHudGate')).Gate
+}
+```
+
+A static `import { AxeHudProvider } from 'axe-hud/react'` that only renders conditionally also
+works, but it leaves axe-hud in the bundle; prefer the dynamic import when you care about prod size.
+
+## Why no built-in gate?
+
+Runtime hostname detection has to _guess_ the environment and can be wrong, and it still ships the
+code to production. Letting the consumer decide where to load axe-hud is simpler, has one source of
+truth (your build config), and guarantees nothing reaches end users.

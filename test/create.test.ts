@@ -16,15 +16,8 @@ describe('createAxeHud', () => {
     document.body.innerHTML = ''
   })
 
-  it('mounts nothing and returns an inert controller when disabled', () => {
-    const hud = createAxeHud({ enabled: false })
-    expect(document.getElementById(HUD_ROOT_ID)).toBeNull()
-    expect(() => hud.destroy()).not.toThrow()
-  })
-
-  it('mounts an isolated shadow root when enabled', () => {
+  it('mounts an isolated shadow root', () => {
     const hud = createAxeHud({
-      enabled: true,
       axe: fakeAxe([]),
       runOn: { initial: false, navigation: false },
     })
@@ -37,7 +30,6 @@ describe('createAxeHud', () => {
 
   it('reflects audit results in the widget', async () => {
     const hud = createAxeHud({
-      enabled: true,
       axe: fakeAxe(['critical', 'serious']),
       runOn: { initial: false, navigation: false },
     })
@@ -52,7 +44,6 @@ describe('createAxeHud', () => {
   it('invokes onAudit for completed audits', async () => {
     const onAudit = vi.fn()
     const hud = createAxeHud({
-      enabled: true,
       axe: fakeAxe([]),
       runOn: { initial: false, navigation: false },
       onAudit,

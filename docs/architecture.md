@@ -7,8 +7,7 @@ optional React binding; the HUD UI is rendered with Preact inside a shadow root.
 
 | File                 | Responsibility                                                                                         |
 | -------------------- | ------------------------------------------------------------------------------------------------------ |
-| `src/types.ts`       | Public types: `Environment`, `Impact`, `AxeHudOptions`, `AxeHudController`, `AuditOutcome`, …          |
-| `src/env.ts`         | `detectEnvironment()` (hostname heuristics) and `resolveEnabled()` (the production gate).              |
+| `src/types.ts`       | Public types: `Impact`, `AxeHudOptions`, `AxeHudController`, `AuditOutcome`, …                         |
 | `src/navigation.ts`  | `NavigationObserver` — a ref-counted patch of `pushState`/`replaceState` plus `popstate`/`hashchange`. |
 | `src/runner.ts`      | `AxeRunner` — lazy-loads axe-core, runs/cancels audits, debounces and idle-defers `schedule()`.        |
 | `src/store.ts`       | `Store<T>` — a tiny reactive store (get / set / subscribe).                                            |
@@ -31,9 +30,10 @@ navigation / initial / manual ─▶ AxeRunner.schedule ─▶ axe.run ─▶ Au
                                                          useStore (Preact) ─▶ Widget / Sidebar
 ```
 
-`createAxeHud` resolves the gate, mounts the UI into a shadow root, constructs the runner,
-navigation observer, store, and highlighter, then wires audits → store → UI. The returned
-controller (`audit` / `open` / `close` / `destroy`) is the public handle.
+`createAxeHud` mounts the UI into a shadow root (when a DOM is present), constructs the runner,
+navigation observer, store, and highlighter, then wires audits → store → UI. It has no environment
+gating — the consumer decides where to load it. The returned controller
+(`audit` / `open` / `close` / `destroy`) is the public handle.
 
 ## Design choices
 
@@ -51,6 +51,6 @@ controller (`audit` / `open` / `close` / `destroy`) is the public handle.
 
 ## Tests
 
-Vitest + jsdom. Unit tests cover env/gating, the navigation observer, the runner (lazy load,
+Vitest + jsdom. Unit tests cover SSR safety, the navigation observer, the runner (lazy load,
 cancellation, debounce), the store, results derivations, the highlighter, SSR safety, and
 integration tests that mount the HUD and assert widget/sidebar/keyboard behaviour.

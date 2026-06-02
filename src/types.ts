@@ -1,8 +1,5 @@
 import type { AxeResults, ElementContext, RunOptions } from 'axe-core'
 
-/** Coarse runtime environment the HUD uses to decide whether it may run. */
-export type Environment = 'local' | 'preview' | 'stage' | 'production' | 'unknown'
-
 /** axe-core severity levels, worst to least. */
 export type Impact = 'critical' | 'serious' | 'moderate' | 'minor'
 
@@ -43,14 +40,14 @@ export interface AxeLike {
   run(context: ElementContext, options?: RunOptions): Promise<AxeResults>
 }
 
-/** Public configuration for the HUD. */
+/**
+ * Public configuration for the HUD.
+ *
+ * Note: the HUD has no environment gating of its own — calling `createAxeHud()` mounts it
+ * (when a DOM is present). Decide *where* it runs by deciding where you load/call it, e.g. a
+ * guarded dynamic import in development or staging builds.
+ */
 export interface AxeHudOptions {
-  /** Explicit override. When set, wins over environment detection (forces on/off). */
-  enabled?: boolean
-  /** Environments the HUD is allowed to run in. Defaults to `['local', 'preview', 'stage']`. */
-  environments?: Environment[]
-  /** Custom environment detector. Defaults to the built-in `detectEnvironment`. */
-  detect?: () => Environment
   /** Inject a custom axe-core instance instead of the bundled lazy import. */
   axe?: AxeLike
   /** Options forwarded to `axe.run`. Defaults to the EN 301 549 (EU baseline) tag set. */

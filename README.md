@@ -11,8 +11,8 @@
 
 ![axe-hud widget and report sidebar](./docs/assets/preview.svg)
 
-Framework-agnostic core with an optional React binding. Designed to be **off in production** and
-enabled only in local, preview, and staging environments.
+Framework-agnostic core with an optional React binding. The library has **no environment logic** —
+you decide where it runs by deciding where you load it (so it ships nothing to production).
 
 > **Status:** early development (pre-1.0). The public API may change before `1.0.0`.
 
@@ -29,8 +29,8 @@ developers and QA live, in-context feedback against the **EU-required baseline**
 - 📋 Report **sidebar** grouped by impact, with severity filters, doc links, and click-to-highlight.
 - 🔁 Re-audits on SPA navigation (History API, `popstate`, `hashchange`) and on demand.
 - 🧱 Isolated in a **Shadow DOM** — never leaks styles into, or scans, your app's own UI.
-- 🚫 Conservative **production gate**: never runs on production unless you explicitly force it.
-- ⚡ axe-core is **lazy-loaded** only when the HUD is enabled, so production bundles don't pay for it.
+- 🎛️ **No env gating in the library** — load it where you want it; guard the import and it never ships to production.
+- ⚡ axe-core is **lazy-loaded** on first audit, and code-split so a guarded import drops it from prod bundles.
 - ♿ The HUD itself is keyboard accessible (focus management, Escape to close, reduced-motion aware).
 
 ## Install
@@ -41,6 +41,9 @@ npm install axe-hud
 ```
 
 ## Quick start
+
+`createAxeHud()` mounts the HUD immediately. The library has no environment gating, so **you**
+decide where it runs by deciding where you load it.
 
 ### Vanilla
 
@@ -69,51 +72,53 @@ export function App() {
 }
 ```
 
-Access the controller anywhere below the provider:
+Access the controller anywhere below the provider with `useAxeHud()`.
 
-```tsx
-import { useAxeHud } from 'axe-hud/react'
+## Loading it for the right environments
 
-const hud = useAxeHud()
-hud?.audit()
-```
-
-## Environment gating
-
-By default the HUD runs only in `local`, `preview`, and `stage` environments and **never** on
-`production`. The environment is inferred from `window.location.hostname` using generic heuristics
-(localhost, common preview/staging markers); anything unrecognized is treated as production, so the
-gate **fails safe**.
-
-Override detection or force the HUD explicitly:
+Keep axe-hud out of production by **not importing it there**. A guarded dynamic import is the
+reliable way — the bundler drops the whole chunk (axe-hud + axe-core) from builds where the branch
+is statically false, so nothing ships to production.
 
 ```ts
-createAxeHud({
-  // Force on/off regardless of detection (wins over everything):
-  enabled: import.meta.env.DEV,
+// Load only in local + staging. `import()` keeps it out of the prod bundle entirely.
+const APP_ENV = import.meta.env.VITE_APP_ENV // your own build-time variable
 
-  // …or constrain which detected environments are allowed:
-  environments: ['local', 'preview', 'stage'],
-
-  // …or plug in your own detector:
-  detect: () => (location.hostname.includes('.internal') ? 'stage' : 'production'),
-})
+if (APP_ENV === 'development' || APP_ENV === 'staging') {
+  const { createAxeHud } = await import('axe-hud')
+  createAxeHud()
+}
 ```
+
+```ts
+// Vite's built-in dev flag (local dev server only):
+if (import.meta.env.DEV) {
+  const { createAxeHud } = await import('axe-hud')
+  createAxeHud()
+}
+```
+
+```ts
+// Node-style env (webpack, etc.):
+if (['development', 'staging'].includes(process.env.APP_ENV)) {
+  import('axe-hud').then(({ createAxeHud }) => createAxeHud())
+}
+```
+
+For React, gate the provider (or its import) the same way. See
+[docs/environments.md](./docs/environments.md) for more patterns.
 
 ## Configuration
 
-| Option         | Type                                                           | Default                                                | Description                                        |
-| -------------- | -------------------------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------- |
-| `enabled`      | `boolean`                                                      | _(unset)_                                              | Force on/off. Overrides environment detection.     |
-| `environments` | `Environment[]`                                                | `['local', 'preview', 'stage']`                        | Detected environments the HUD may run in.          |
-| `detect`       | `() => Environment`                                            | built-in hostname detection                            | Custom environment detector.                       |
-| `axe`          | `AxeLike`                                                      | lazy `import('axe-core')`                              | Inject a custom/pinned axe instance.               |
-| `axeOptions`   | `axe.RunOptions`                                               | `{ runOnly: { type: 'tag', values: ['EN-301-549'] } }` | Options passed to `axe.run` (rule set).            |
-| `axeContext`   | `axe.ElementContext`                                           | excludes the HUD's own root                            | Context passed to `axe.run`.                       |
-| `runOn`        | `{ initial?: boolean; navigation?: boolean }`                  | `{ initial: true, navigation: true }`                  | Which events trigger an audit.                     |
-| `debounceMs`   | `number`                                                       | `250`                                                  | Debounce window for navigation-triggered audits.   |
-| `position`     | `'bottom-right' \| 'bottom-left' \| 'top-right' \| 'top-left'` | `'bottom-right'`                                       | Corner the widget is anchored to.                  |
-| `onAudit`      | `(outcome) => void`                                            | _(none)_                                               | Callback fired with every completed audit outcome. |
+| Option       | Type                                                           | Default                                                | Description                                        |
+| ------------ | -------------------------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------- |
+| `axe`        | `AxeLike`                                                      | lazy `import('axe-core')`                              | Inject a custom/pinned axe instance.               |
+| `axeOptions` | `axe.RunOptions`                                               | `{ runOnly: { type: 'tag', values: ['EN-301-549'] } }` | Options passed to `axe.run` (rule set).            |
+| `axeContext` | `axe.ElementContext`                                           | excludes the HUD's own root                            | Context passed to `axe.run`.                       |
+| `runOn`      | `{ initial?: boolean; navigation?: boolean }`                  | `{ initial: true, navigation: true }`                  | Which events trigger an audit.                     |
+| `debounceMs` | `number`                                                       | `250`                                                  | Debounce window for navigation-triggered audits.   |
+| `position`   | `'bottom-right' \| 'bottom-left' \| 'top-right' \| 'top-left'` | `'bottom-right'`                                       | Corner the widget is anchored to.                  |
+| `onAudit`    | `(outcome) => void`                                            | _(none)_                                               | Callback fired with every completed audit outcome. |
 
 ### Controller
 
@@ -141,8 +146,9 @@ createAxeHud({
 ## Performance
 
 axe-core is imported lazily on the first audit and runs debounced and deferred to browser idle time.
-Navigation re-audits are coalesced, and superseded runs are discarded. Because the HUD is gated off
-in production, end users never download axe-core.
+Navigation re-audits are coalesced, and superseded runs are discarded. When you load axe-hud behind
+a guarded dynamic import, it and axe-core are code-split out of production builds entirely, so end
+users never download either.
 
 ## Browser support
 
@@ -151,7 +157,7 @@ intended to ship to end users in production.
 
 ## Documentation
 
-- [Environments & the production gate](./docs/environments.md)
+- [Loading it for the right environments](./docs/environments.md)
 - [Recipes](./docs/recipes.md)
 - [Architecture](./docs/architecture.md) (for contributors)
 - [API reference](https://mteimoori.github.io/axe-hud/api/)

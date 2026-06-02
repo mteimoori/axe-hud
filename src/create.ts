@@ -1,4 +1,3 @@
-import { resolveEnabled } from './env'
 import { Highlighter } from './highlight'
 import { NavigationObserver } from './navigation'
 import { AxeRunner } from './runner'
@@ -22,18 +21,15 @@ function currentUrl(): string {
 /**
  * Create and mount the accessibility HUD.
  *
- * Resolves whether it may run (environment gate), and if so mounts the widget in an isolated
- * shadow root, wires navigation-triggered re-audits, and runs an initial audit. When disabled —
- * including on the server, where there is no DOM — it returns an inert controller and mounts
- * nothing, so it is safe to call unconditionally.
+ * Mounts the widget in an isolated shadow root, wires navigation-triggered re-audits, and runs an
+ * initial audit. The HUD has no environment gating of its own — decide *where* it runs by deciding
+ * where you call this (e.g. a guarded dynamic import in dev/staging builds). On the server, where
+ * there is no DOM, it returns an inert controller and mounts nothing, so it is safe to call.
  */
 export function createAxeHud(options: AxeHudOptions = {}): AxeHudController {
-  const enablement = resolveEnabled(options)
-  if (!enablement.enabled || typeof document === 'undefined') {
+  if (typeof document === 'undefined') {
     return NOOP_CONTROLLER
   }
-
-  console.info(`[axe-hud] active — ${enablement.reason}`)
 
   const store = new Store<HudState>(initialHudState(currentUrl()))
   const runner = new AxeRunner({

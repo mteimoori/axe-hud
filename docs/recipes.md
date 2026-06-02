@@ -2,17 +2,25 @@
 
 Practical patterns for wiring up axe-hud.
 
-## Conditionally enable in a bundler
+## Load only outside production
+
+The library has no environment gating — keep it out of production by not importing it there. A
+guarded dynamic import drops the whole chunk from prod builds:
 
 ```ts
-import { createAxeHud } from 'axe-hud'
-
 // Vite
-createAxeHud({ enabled: import.meta.env.DEV })
+if (import.meta.env.DEV) {
+  const { createAxeHud } = await import('axe-hud')
+  createAxeHud()
+}
 
 // Webpack / Node-style
-createAxeHud({ enabled: process.env.NODE_ENV !== 'production' })
+if (process.env.NODE_ENV !== 'production') {
+  import('axe-hud').then(({ createAxeHud }) => createAxeHud())
+}
 ```
+
+See [environments.md](./environments.md) for a local + staging example and the React variant.
 
 ## React
 
@@ -21,7 +29,7 @@ import { AxeHudProvider } from 'axe-hud/react'
 
 export function Root() {
   return (
-    <AxeHudProvider environments={['local', 'preview', 'stage']}>
+    <AxeHudProvider>
       <App />
     </AxeHudProvider>
   )
