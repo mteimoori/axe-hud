@@ -146,7 +146,15 @@ export const hudStyles = `
 .axe-hud-finding__summary:hover { background: #f9fafb; }
 .axe-hud-finding__summary:focus-visible { outline: 2px solid #2563eb; outline-offset: -2px; }
 .axe-hud-finding__title { flex: 1; font-weight: 600; }
-.axe-hud-finding__chevron { color: #9ca3af; }
+.axe-hud-finding__chevron {
+  flex: none;
+  color: #9ca3af;
+  transition: transform 120ms ease;
+}
+.axe-hud-finding__chevron.is-open { transform: rotate(90deg); }
+@media (prefers-reduced-motion: reduce) {
+  .axe-hud-finding__chevron { transition: none; }
+}
 
 .axe-hud-dot {
   flex: none;

@@ -27,9 +27,20 @@ export function FindingCard({ violation, onHighlight }: FindingCardProps) {
       >
         <span class={`axe-hud-dot axe-hud-dot--${impact}`} aria-hidden="true" />
         <span class="axe-hud-finding__title">{violation.help}</span>
-        <span class="axe-hud-finding__chevron" aria-hidden="true">
-          {open ? '▾' : '▸'}
-        </span>
+        <svg
+          class={`axe-hud-finding__chevron${open ? ' is-open' : ''}`}
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
       </button>
 
       {open && (
