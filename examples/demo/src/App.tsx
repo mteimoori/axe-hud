@@ -140,16 +140,44 @@ export function App() {
     // `enabled` forces the HUD on even on the production-like Pages host, for demo purposes.
     <AxeHudProvider enabled>
       <header className="site-header">
-        <h1>axe-hud</h1>
-        <nav aria-label="Demo pages">
-          {PAGES.map((page) => (
-            <a key={page.path} href={page.path} aria-current={page === active ? 'page' : undefined}>
-              {page.label}
-            </a>
-          ))}
-        </nav>
+        <div className="container site-header__inner">
+          <a className="brand" href="#/">
+            <span className="brand__mark" aria-hidden="true">
+              axe
+            </span>
+            <span className="brand__name">axe-hud</span>
+          </a>
+          <nav className="nav" aria-label="Demo pages">
+            {PAGES.map((page) => (
+              <a
+                key={page.path}
+                href={page.path}
+                className="nav__link"
+                aria-current={page === active ? 'page' : undefined}
+              >
+                {page.label}
+              </a>
+            ))}
+          </nav>
+        </div>
       </header>
-      <main>{active.render()}</main>
+
+      <main className="container main">
+        <p className="lead">
+          A live demo of the in-page accessibility HUD. Open the widget in the bottom-right corner,
+          then switch pages to watch it re-audit. Most pages seed real violations; the{' '}
+          <a href="#/clean">Clean</a> page passes.
+        </p>
+        <div className="card">{active.render()}</div>
+      </main>
+
+      <footer className="site-footer">
+        <div className="container">
+          <a href="https://github.com/mteimoori/axe-hud">GitHub</a>
+          <span aria-hidden="true">·</span>
+          <span>Built with axe-hud</span>
+        </div>
+      </footer>
     </AxeHudProvider>
   )
 }

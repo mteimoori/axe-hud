@@ -1,5 +1,11 @@
 :root {
   color-scheme: light;
+  --bg: #fbfbfd;
+  --surface: #ffffff;
+  --border: #e7e8ec;
+  --text: #1d1d1f;
+  --muted: #6b7280;
+  --accent: #2563eb;
   font-family:
     ui-sans-serif,
     system-ui,
@@ -7,84 +13,177 @@
     'Segoe UI',
     Roboto,
     sans-serif;
-  color: #1f2937;
+  color: var(--text);
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  background: #f8fafc;
+  background: var(--bg);
+  line-height: 1.55;
 }
 
-.site-header {
-  padding: 24px 32px;
-  background: #fff;
-  border-bottom: 1px solid #e5e7eb;
-}
-.site-header h1 {
-  margin: 0 0 12px;
-  font-size: 22px;
-}
-.site-header nav {
-  display: flex;
-  gap: 16px;
-}
-.site-header nav a {
-  color: #2563eb;
-  text-decoration: none;
-  font-weight: 600;
-}
-.site-header nav a[aria-current='page'] {
-  text-decoration: underline;
-}
-
-main {
+.container {
+  width: 100%;
   max-width: 720px;
   margin: 0 auto;
-  padding: 32px;
+  padding: 0 24px;
 }
 
-section h2 {
-  margin-top: 0;
+/* Header ------------------------------------------------------------------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 60px;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 700;
+  font-size: 17px;
+}
+.brand__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  padding: 0 9px;
+  border-radius: 7px;
+  background: var(--text);
+  color: #fff;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.nav {
+  display: flex;
+  gap: 4px;
+}
+.nav__link {
+  padding: 6px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+.nav__link:hover {
+  background: #f1f2f4;
+  color: var(--text);
+}
+.nav__link[aria-current='page'] {
+  background: var(--text);
+  color: #fff;
+}
+
+/* Main --------------------------------------------------------------------- */
+.main {
+  padding-top: 40px;
+  padding-bottom: 64px;
+}
+.lead {
+  margin: 0 0 24px;
+  color: var(--muted);
+  font-size: 17px;
+}
+.lead a {
+  color: var(--accent);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 28px 32px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.card h2 {
+  margin: 0 0 12px;
+  font-size: 20px;
+}
+.card p {
+  margin: 0 0 14px;
 }
 
 input,
 select {
   display: block;
-  margin: 8px 0;
-  padding: 8px 10px;
+  width: 100%;
+  max-width: 320px;
+  margin: 10px 0;
+  padding: 9px 12px;
   font: inherit;
-}
-
-/* Intentionally low contrast to trigger a colour-contrast violation. */
-.low-contrast {
-  color: #c9ccd1;
-}
-
-/* Intentionally nameless icon button to trigger a button-name violation. */
-.icon-button {
-  width: 36px;
-  height: 36px;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  border: 1px solid #d1d5db;
   background: #fff;
-}
-
-.demo-dialog {
-  margin-top: 16px;
-  padding: 16px;
-  display: grid;
-  gap: 12px;
-  max-width: 360px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
 }
 
 button {
-  padding: 8px 14px;
+  padding: 9px 16px;
   font: inherit;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #fff;
+  cursor: pointer;
+}
+button:hover {
+  background: #f6f7f9;
+}
+
+/* Footer ------------------------------------------------------------------- */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 24px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.site-footer .container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.site-footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* Intentional violations --------------------------------------------------- */
+.low-contrast {
+  color: #c9ccd1;
+}
+.icon-button {
+  width: 36px;
+  height: 36px;
+  padding: 0;
   border-radius: 8px;
   border: 1px solid #d1d5db;
   background: #fff;
-  cursor: pointer;
+}
+.demo-dialog {
+  margin-top: 16px;
+  padding: 20px;
+  display: grid;
+  gap: 12px;
+  max-width: 360px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
