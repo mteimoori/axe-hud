@@ -137,8 +137,7 @@ export function App() {
   const active = PAGES.find((page) => page.path === hash) ?? PAGES[0]
 
   return (
-    // `enabled` forces the HUD on even on the production-like Pages host, for demo purposes.
-    <AxeHudProvider enabled>
+    <AxeHudProvider>
       <header className="site-header">
         <div className="container site-header__inner">
           <a className="brand" href="#/">
