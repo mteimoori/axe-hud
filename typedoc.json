@@ -1,0 +1,9 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.ts", "src/react/index.ts"],
+  "out": "site/api",
+  "name": "axe-hud API",
+  "readme": "none",
+  "excludeInternal": true,
+  "githubPages": false
+}

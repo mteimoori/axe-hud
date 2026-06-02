@@ -49,7 +49,7 @@ export interface AxeHudOptions {
   enabled?: boolean
   /** Environments the HUD is allowed to run in. Defaults to `['local', 'preview', 'stage']`. */
   environments?: Environment[]
-  /** Custom environment detector. Defaults to {@link detectEnvironment}. */
+  /** Custom environment detector. Defaults to the built-in `detectEnvironment`. */
   detect?: () => Environment
   /** Inject a custom axe-core instance instead of the bundled lazy import. */
   axe?: AxeLike
