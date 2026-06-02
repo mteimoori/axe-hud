@@ -38,6 +38,9 @@ jobs:
       - name: Build demo
         run: pnpm --filter axe-hud-demo build
 
+      - name: Build API reference
+        run: pnpm exec typedoc --out examples/demo/dist/api
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
