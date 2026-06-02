@@ -1,14 +1,15 @@
 # axe-hud
 
 [![CI](https://github.com/mteimoori/axe-hud/actions/workflows/ci.yml/badge.svg)](https://github.com/mteimoori/axe-hud/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/axe-hud.svg)](https://www.npmjs.com/package/axe-hud)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 > In-page accessibility HUD powered by [axe-core](https://github.com/dequelabs/axe-core). It audits
 > the page you're looking at and surfaces findings in-context — a floating widget and a report
 > sidebar — re-auditing automatically as you navigate.
 
-**🔎 [Live demo →](https://mteimoori.github.io/axe-hud/)**
+**🔎 [Live demo →](https://mteimoori.github.io/axe-hud/)** · **📚 [API reference →](https://mteimoori.github.io/axe-hud/api/)**
+
+![axe-hud widget and report sidebar](./docs/assets/preview.svg)
 
 Framework-agnostic core with an optional React binding. Designed to be **off in production** and
 enabled only in local, preview, and staging environments.
@@ -147,6 +148,13 @@ in production, end users never download axe-core.
 
 Modern evergreen browsers (Chromium, Firefox, Safari). axe-hud is a development/QA aid and is not
 intended to ship to end users in production.
+
+## Documentation
+
+- [Environments & the production gate](./docs/environments.md)
+- [Recipes](./docs/recipes.md)
+- [Architecture](./docs/architecture.md) (for contributors)
+- [API reference](https://mteimoori.github.io/axe-hud/api/)
 
 ## Contributing
 
